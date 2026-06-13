@@ -1,0 +1,20 @@
+{
+  "name": "saferoute",
+  "private": true,
+  "version": "0.1.0",
+  "description": "School bus safety and tracking platform.",
+  "workspaces": [
+    "apps/api",
+    "apps/admin"
+  ],
+  "scripts": {
+    "dev:api": "npm run start:dev -w apps/api",
+    "dev:admin": "npm run dev -w apps/admin",
+    "lint": "npm run lint -ws --if-present",
+    "test": "npm run test -ws --if-present"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
+
