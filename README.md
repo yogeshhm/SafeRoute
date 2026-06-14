@@ -128,3 +128,15 @@ Local PostgreSQL/PostGIS and Redis config is available at:
 ```text
 infra/docker/docker-compose.yml
 ```
+
+Supabase project setup is documented at:
+
+```text
+docs/architecture/supabase-setup.md
+```
+
+Backend API endpoints are documented at:
+
+```text
+docs/api/backend-endpoints.md
+```
