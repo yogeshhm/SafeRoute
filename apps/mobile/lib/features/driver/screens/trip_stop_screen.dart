@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/services/location_service.dart';
 import '../../../core/theme/app_theme.dart';
 
 class TripStopScreen extends StatefulWidget {
@@ -145,6 +146,9 @@ class _TripStopScreenState extends State<TripStopScreen> {
           'completed_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         }).eq('id', widget.tripId);
+
+        // Stop GPS
+        await LocationService.instance.stopTracking();
 
         if (mounted) {
           _showTripCompleteDialog();

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/services/user_service.dart';
 import '../../../core/theme/app_theme.dart';
 
 class ParentHomeScreen extends StatefulWidget {
@@ -27,11 +28,7 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final profile = await _db
-          .from('users')
-          .select('id, full_name')
-          .eq('id', '00000000-0000-4000-8000-000000000201')
-          .single();
+      final profile = await UserService.getParentProfile();
 
       final childrenRaw = await _db.from('students').select(
             'id, full_name, grade, section, route_id, '

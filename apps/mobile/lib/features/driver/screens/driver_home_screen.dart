@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/services/location_service.dart';
+import '../../../core/services/user_service.dart';
 import '../../../core/theme/app_theme.dart';
 
 class DriverHomeScreen extends StatefulWidget {
@@ -29,11 +31,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final profile = await _db
-          .from('users')
-          .select('id, full_name, role')
-          .eq('id', '00000000-0000-4000-8000-000000000102')
-          .single();
+      final profile = await UserService.getDriverProfile();
 
       final bus = await _db
           .from('buses')
@@ -69,6 +67,15 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
             .eq('bus_id', bus['id'])
             .eq('status', 'active')
             .maybeSingle();
+      }
+
+      // Resume GPS if trip was already active
+      if (activeTrip != null && bus != null &&
+          !LocationService.instance.isTracking) {
+        LocationService.instance.startTracking(
+          tripId: activeTrip['id'],
+          busId: bus['id'],
+        );
       }
 
       if (mounted) {
@@ -107,6 +114,13 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
       if (mounted) {
         setState(() => _activeTrip = trip);
+      }
+      // Start GPS tracking
+      await LocationService.instance.startTracking(
+        tripId: trip['id'],
+        busId: _bus!['id'],
+      );
+      if (mounted) {
         context.go('/driver/trip/${trip['id']}/stop/next', extra: trip);
       }
     } catch (e) {
@@ -148,6 +162,16 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () => context.go('/login'),
               ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.logout, color: Colors.white),
+                  onPressed: () async {
+                    await LocationService.instance.stopTracking();
+                    await UserService.signOut();
+                    if (context.mounted) context.go('/login');
+                  },
+                ),
+              ],
               flexibleSpace: FlexibleSpaceBar(
                 background: Container(
                   decoration: const BoxDecoration(
