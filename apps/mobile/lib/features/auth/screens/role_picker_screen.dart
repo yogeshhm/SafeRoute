@@ -70,7 +70,7 @@ class RolePickerScreen extends StatelessWidget {
                       title: 'Driver',
                       subtitle: 'Start trips and manage stops',
                       iconBg: AppColors.primary,
-                      onTap: () => context.go('/driver'),
+                      onTap: () => context.go('/driver?demo=true'),
                     ),
                     const SizedBox(height: 14),
                     _RoleButton(
@@ -78,7 +78,7 @@ class RolePickerScreen extends StatelessWidget {
                       title: 'Parent',
                       subtitle: 'Track your child\'s bus live',
                       iconBg: const Color(0xFF0D8A4E),
-                      onTap: () => context.go('/parent'),
+                      onTap: () => context.go('/parent?demo=true'),
                     ),
                     const SizedBox(height: 24),
                     Row(

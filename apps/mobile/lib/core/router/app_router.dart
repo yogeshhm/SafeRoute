@@ -11,11 +11,13 @@ final appRouter = GoRouter(
   initialLocation: '/login',
   redirect: (context, state) async {
     final session = Supabase.instance.client.auth.currentSession;
+    final isDemo = state.uri.queryParameters['demo'] == 'true';
     final isAuth = state.matchedLocation == '/login' ||
         state.matchedLocation == '/demo';
 
     if (session == null) {
-      return isAuth ? null : '/login';
+      if (isAuth || isDemo) return null;
+      return '/login';
     }
 
     // If logged in and on auth screen, redirect by role
