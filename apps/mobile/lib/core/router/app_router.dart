@@ -1,27 +1,28 @@
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../services/demo_service.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/role_picker_screen.dart';
+import '../../features/auth/screens/signup_screen.dart';
 import '../../features/driver/screens/driver_home_screen.dart';
 import '../../features/driver/screens/trip_stop_screen.dart';
 import '../../features/parent/screens/parent_home_screen.dart';
 import '../../features/parent/screens/trip_tracking_screen.dart';
+import '../../features/shared/screens/profile_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/login',
   redirect: (context, state) async {
     final session = Supabase.instance.client.auth.currentSession;
-    final isDemo = state.uri.queryParameters['demo'] == 'true';
-    final isAuth = state.matchedLocation == '/login' ||
-        state.matchedLocation == '/demo';
+    final loc = state.matchedLocation;
+    final isAuthRoute = loc == '/login' || loc == '/signup' || loc == '/demo';
 
-    if (session == null) {
-      if (isAuth || isDemo) return null;
-      return '/login';
+    if (session == null && !DemoService.isDemo) {
+      return isAuthRoute ? null : '/login';
     }
 
-    // If logged in and on auth screen, redirect by role
-    if (isAuth) {
+    // Logged in + on auth screen → redirect by role
+    if (session != null && isAuthRoute) {
       final profile = await Supabase.instance.client
           .from('users')
           .select('role')
@@ -38,6 +39,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/login',
       builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
+      path: '/signup',
+      builder: (context, state) => const SignupScreen(),
     ),
     GoRoute(
       path: '/demo',
@@ -67,6 +72,10 @@ final appRouter = GoRouter(
           ),
         ),
       ],
+    ),
+    GoRoute(
+      path: '/profile',
+      builder: (context, state) => const ProfileScreen(),
     ),
   ],
 );

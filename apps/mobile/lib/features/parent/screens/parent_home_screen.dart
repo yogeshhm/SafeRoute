@@ -108,9 +108,18 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
               expandedHeight: 140,
               pinned: true,
               leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => context.go('/login'),
+                icon: const Icon(Icons.person_outline, color: Colors.white),
+                onPressed: () => context.push('/profile'),
               ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.logout, color: Colors.white),
+                  onPressed: () async {
+                    await UserService.signOut();
+                    if (context.mounted) context.go('/login');
+                  },
+                ),
+              ],
               flexibleSpace: FlexibleSpaceBar(
                 background: Container(
                   decoration: const BoxDecoration(

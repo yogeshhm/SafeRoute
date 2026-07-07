@@ -11,6 +11,7 @@ class AppColors {
   static const green = Color(0xFF12B76A);
   static const orange = Color(0xFFF79009);
   static const red = Color(0xFFEF4444);
+  static const border = Color(0xFFDDE1EE);
 }
 
 class AppTheme {

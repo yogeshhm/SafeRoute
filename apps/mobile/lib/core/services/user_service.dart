@@ -1,9 +1,9 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'demo_service.dart';
 
 class UserService {
   static final _db = Supabase.instance.client;
 
-  // Demo IDs for testing without auth
   static const _demoDriverId = '00000000-0000-4000-8000-000000000102';
   static const _demoParentId = '00000000-0000-4000-8000-000000000201';
 
@@ -12,13 +12,13 @@ class UserService {
     if (authUser != null) {
       return await _db
           .from('users')
-          .select('id, full_name, role')
+          .select('id, full_name, role, phone, email')
           .eq('auth_user_id', authUser.id)
           .single();
     }
     return await _db
         .from('users')
-        .select('id, full_name, role')
+        .select('id, full_name, role, phone, email')
         .eq('id', _demoDriverId)
         .single();
   }
@@ -28,18 +28,19 @@ class UserService {
     if (authUser != null) {
       return await _db
           .from('users')
-          .select('id, full_name, role')
+          .select('id, full_name, role, phone, email')
           .eq('auth_user_id', authUser.id)
           .single();
     }
     return await _db
         .from('users')
-        .select('id, full_name, role')
+        .select('id, full_name, role, phone, email')
         .eq('id', _demoParentId)
         .single();
   }
 
   static Future<void> signOut() async {
+    DemoService.exit();
     await _db.auth.signOut();
   }
 }

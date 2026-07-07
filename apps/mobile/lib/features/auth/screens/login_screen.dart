@@ -172,6 +172,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             : const Text('Sign In'),
                       ),
                       const SizedBox(height: 12),
+                      OutlinedButton(
+                        onPressed: () => context.go('/signup'),
+                        child: const Text('Create Account'),
+                      ),
+                      const SizedBox(height: 8),
                       TextButton(
                         onPressed: () => context.go('/demo'),
                         child: const Text(

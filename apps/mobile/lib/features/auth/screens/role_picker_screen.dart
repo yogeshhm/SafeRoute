@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/services/demo_service.dart';
 import '../../../core/theme/app_theme.dart';
 
 class RolePickerScreen extends StatelessWidget {
@@ -70,7 +71,7 @@ class RolePickerScreen extends StatelessWidget {
                       title: 'Driver',
                       subtitle: 'Start trips and manage stops',
                       iconBg: AppColors.primary,
-                      onTap: () => context.go('/driver?demo=true'),
+                      onTap: () { DemoService.enter(); context.go('/driver'); },
                     ),
                     const SizedBox(height: 14),
                     _RoleButton(
@@ -78,7 +79,7 @@ class RolePickerScreen extends StatelessWidget {
                       title: 'Parent',
                       subtitle: 'Track your child\'s bus live',
                       iconBg: const Color(0xFF0D8A4E),
-                      onTap: () => context.go('/parent?demo=true'),
+                      onTap: () { DemoService.enter(); context.go('/parent'); },
                     ),
                     const SizedBox(height: 24),
                     Row(

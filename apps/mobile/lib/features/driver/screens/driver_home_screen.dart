@@ -134,6 +134,67 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
     }
   }
 
+  void _showSOS() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.sos_rounded, color: AppColors.red),
+            SizedBox(width: 8),
+            Text('Emergency SOS', style: TextStyle(color: AppColors.red)),
+          ],
+        ),
+        content: const Text(
+          'This will alert the school admin immediately with your current location. Use only in genuine emergencies.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await _sendSOS();
+            },
+            style: FilledButton.styleFrom(backgroundColor: AppColors.red),
+            child: const Text('Send SOS'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _sendSOS() async {
+    try {
+      final pos = await LocationService.instance.currentPosition();
+      await _db.from('sos_alerts').insert({
+        'driver_user_id': _profile?['id'],
+        'bus_id': _bus?['id'],
+        'trip_id': _activeTrip?['id'],
+        'latitude': pos?.latitude,
+        'longitude': pos?.longitude,
+        'status': 'active',
+        'created_at': DateTime.now().toIso8601String(),
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('SOS sent to school admin'),
+            backgroundColor: AppColors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('SOS failed: $e'), backgroundColor: AppColors.red),
+        );
+      }
+    }
+  }
+
   String _greeting() {
     final h = DateTime.now().hour;
     if (h < 12) return 'Good morning';
@@ -150,6 +211,12 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
     }
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _showSOS,
+        backgroundColor: AppColors.red,
+        icon: const Icon(Icons.sos_rounded, color: Colors.white),
+        label: const Text('SOS', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      ),
       body: RefreshIndicator(
         onRefresh: _load,
         color: AppColors.primary,
@@ -159,8 +226,8 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               expandedHeight: 160,
               pinned: true,
               leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => context.go('/login'),
+                icon: const Icon(Icons.person_outline, color: Colors.white),
+                onPressed: () => context.push('/profile'),
               ),
               actions: [
                 IconButton(
@@ -249,16 +316,25 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                         ),
                       ),
                     ] else ...[
-                      FilledButton.icon(
-                        onPressed: _starting ? null : () => _startTrip('morning_pickup'),
-                        icon: const Icon(Icons.wb_sunny_outlined),
-                        label: const Text('Begin Morning Pickup'),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.icon(
+                          onPressed: _starting ? null : () => _startTrip('morning_pickup'),
+                          icon: _starting
+                              ? const SizedBox(width: 18, height: 18,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                              : const Icon(Icons.wb_sunny_outlined),
+                          label: const Text('Begin Morning Pickup'),
+                        ),
                       ),
                       const SizedBox(height: 12),
-                      OutlinedButton.icon(
-                        onPressed: _starting ? null : () => _startTrip('evening_drop'),
-                        icon: const Icon(Icons.nights_stay_outlined),
-                        label: const Text('Begin Return Trip'),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: _starting ? null : () => _startTrip('evening_drop'),
+                          icon: const Icon(Icons.nights_stay_outlined),
+                          label: const Text('Begin Return Trip'),
+                        ),
                       ),
                     ],
                     const SizedBox(height: 24),

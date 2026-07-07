@@ -55,6 +55,16 @@ class LocationService {
     _activeBusId = null;
   }
 
+  Future<Position?> currentPosition() async {
+    try {
+      return await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> _onPosition(Position pos) async {
     if (_activeTripId == null || _activeBusId == null) return;
     try {
